@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	<body>
+		<canvas id="myCanvas" width="800" height="480" style="border: 1px solid black"></canvas>
+		<script>
+		
+            //make canvas into a variable so we can draw in it
+            var canvas = document.getElementById("myCanvas");
+		
+            //check for keyboard key pressed
+            document.addEventListener('keydown',keyd);
+            
+            //makes it possible to draw on the canvas
+            var context = canvas.getContext('2d');
+		
+            //background image
+            var img = new Image();
+            img.src = 'background_1.png';
+            
+            //character image
+            var myImage = new Image();
+            //myImage.src = "smile.jpg";
+            myImage.src = 'walkingsprite_4.png';
+            
+            //object image
+            var Obj_img = new Image();
+            Obj_img.src = "bee.jpg";
+		
+            // how much the background_image(s) have moved
+            var vx = 0;
+            
+            //x-position of character
+            var xpos = 350;
+            
+            //y-position of character
+            var ypos = 175;
+            
+            //y-position of object moving at character
+            var ypos_obj = (Math.floor(Math.random() * 100) + 160);
+            
+            //x-position of object moving at character
+            var xpos_obj = 800-Math.abs(vx);
+            
+            //used to determine if the character is moving left or right
+            var right = true;
+            
+            //character frame
+            var frame = 0;
+            
+            //if no object in front, then character moves
+            var mvnt = true;
+            
+            //loop the game
+            function GameLoop(){
+                Update();
+                Draw();
+            }
+            
+            //every 100 milliseconds loop the game
+            setInterval(GameLoop, 100)
+
+            //Put updating functions in here
+            function Update(){ //update game (not sure what to use it for...)
+
+                //collision detection
+                if ((xpos >= (xpos_obj - 70) && xpos_obj >= 335) && (((ypos+88) >= ypos_obj && ypos_obj >= ypos) || ((ypos-40) <= ypos_obj && ypos_obj <= ypos))) {
+                    mvnt = false;
+                    //break;
+                }
+                else {
+                    mvnt = true;
+                    vx = vx - 5;
+                    xpos_obj = 800-(2*Math.abs(vx));
+                    //reset loop for printing images
+                    if (Math.abs(vx) > img.width) {
+                        vx = 0;
+                    
+                        //new position of object
+                        ypos_obj = (Math.floor(Math.random() * 100) + 160);
+                    }
+                }
+                
+                frame++;
+                if (frame >= 3) frame = 0;
+            }
+            
+            //Put drawing functions in here
+            function Draw(){
+                
+                //clear the screen(canvas) before printing
+                context.clearRect(0, 0, canvas.width, canvas.height);
+			
+                //moving left
+                if (right == false) {
+                    //printing rightmost background img
+                    if (vx != 0) {
+                        context.drawImage(img, img.width-Math.abs(vx), 0);
+                    }
+                    //printing leftmost background img
+                    if (Math.abs(vx) < 400) {
+                        context.drawImage(img, Math.abs(vx)-img.width, 0);
+                    }
+                    //printing center background img
+                    context.drawImage(img, vx, 0);
+                }
+            
+                //moving right
+                else if (right == true) {
+                    //printing leftmost img
+                    if (vx != 0) {
+                        context.drawImage(img, Math.abs(vx)-img.width, 0);
+                    }
+                    //printing rightmost img
+                    context.drawImage(img, img.width-Math.abs(vx), 0);
+                    //printing center background img
+                    context.drawImage(img, vx, 0);
+                }
+			
+                //draw character
+                context.drawImage(myImage, frame*100, 0, 100, 100, xpos, ypos, 100, 100);
+			
+                //draw object coming at him
+                context.drawImage(Obj_img, xpos_obj, ypos_obj);
+			
+            }
+		
+            function keyd(e){
+                    switch(e.keyCode){
+                        case 37:
+                            //console.log("left arrow");
+                            //moving left
+                            //right = false;
+						
+                            //currently not working
+                            //vx = vx + 5;
+                            break;
+                        case 38:
+                            //console.log("up arrow");
+                            //moving up
+                            if (ypos > 150) {
+                                ypos -= 7;
+                            }
+                            break;
+                        case 39:
+                            //console.log("right arrow");
+                            //moving right
+                            right = true;
+                            if (mvnt == true) {
+                                vx = vx - 12;
+                            }
+                            break;
+                        case 40:
+                            //console.log("down arrow");
+                            //moving down
+                            if (ypos < 300) {
+                                ypos += 7;
+                            }
+                            break;
+                    }
+                }		
+		</script>
+		
+	</body>
+</html>
